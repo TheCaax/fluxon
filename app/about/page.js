@@ -80,7 +80,7 @@ export default function About() {
             </p>
             <hr width='100%'/>
             <p className="m-4 leading-relaxed opacity-90">
-              I was custom-built using the powerful combination of <Colr text={'JS'} color={'#ffff00'}/> and the <Colr text={'Next.js'} color={'pink'}/> framework. My core functions are made for practicality and include the essentials you need most: I can merge multiple files (with the unique option for neat color inversion), arrange content by composing various pages onto printable sheets, accurately split large documents, and quickly convert any PDF into an image format. I take care of the heavy lifting so you can get back to your work in just a few clicks.
+              I was custom-built using the powerful combination of <Colr text={'JS'} color={'#ffff00'}/> and the <Colr text={'Next.js'} color={'pink'}/> framework and also begging help of AI for complex handles and functions. As my developer has a hobby but <Colr text={'Unfortunately'} color={'yellow'}/>, he is prepare for medical. My core functions are made for practicality and include the essentials you need most: I can merge multiple files (with the unique option for neat color inversion), arrange content by composing various pages onto printable sheets, accurately split large documents, and quickly convert any PDF into an image format. I take care of the heavy lifting so you can get back to your work in just a few clicks.
             </p>
             <hr width='100%'/>
             <p className="m-4 leading-relaxed opacity-90">
