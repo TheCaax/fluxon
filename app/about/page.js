@@ -12,7 +12,7 @@ import { Instagram, HomeIcon } from 'lucide-react';
 export default function About() {
     return (
         <>
-        <title>About - know the reason behind this | Fluxon</title>
+        <title>About - know the reason to build this | Fluxon</title>
         <Navbar/>
         <AnimatedBg/>
         <motion.div  
