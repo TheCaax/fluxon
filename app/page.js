@@ -92,7 +92,7 @@ export default function Overview() {
               <span className="bg-linear-to-r from-purple-400 via-blue-400 to-green-400 bg-clip-text text-transparent animate-pulse">
                 Academic{" "}
               </span>
-              needs
+              stuffs
               <span className="text-cyan-400">.</span>
             </h1>
 
