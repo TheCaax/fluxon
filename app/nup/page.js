@@ -139,6 +139,7 @@ export default function Nup() {
   );
   return (
     <>
+    <title>Compose - Make your pdf printer-friendly | Fluxon</title>
       <Navbar />
       <AnimatedBg />
       <motion.div

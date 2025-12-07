@@ -127,6 +127,7 @@ export default function Imaging() {
 
   return (
     <>
+    <title>Imaging - convert pdfs to images for your need | Fluxon</title>
       <Navbar />
       <AnimatedBg />
       <motion.div

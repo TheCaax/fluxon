@@ -131,6 +131,7 @@ export default function Merge() {
 
   return (
     <>
+    <title>Merge - merge your pdfs into onefile | Fluxon</title>
       <Navbar />
       <AnimatedBg />
       <motion.div

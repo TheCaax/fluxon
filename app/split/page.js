@@ -167,6 +167,7 @@ export default function SplitPage() {
 
   return (
     <>
+    <title>Split - cut pdfs into pieces | Fluxon</title>
     <Navbar/>
     <AnimatedBg/>
     <motion.div initial={{ opacity: 0, y: 15 }}

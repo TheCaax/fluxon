@@ -184,7 +184,7 @@ export default function Overview() {
           </div>
         </section>
       </motion.div>
-      <Footer bridge={'Do more with your stuff!'} name={'Overview'} />
+      <Footer bridge={'Do more with your stuff'} name={'Overview'} />
     </>
   );
 }

@@ -8,9 +8,11 @@ import GradientText from '@/components/GradientText';
 import Link from 'next/link';
 import { Instagram, HomeIcon } from 'lucide-react';
 
+
 export default function About() {
     return (
         <>
+        <title>About - know the reason behind this | Fluxon</title>
         <Navbar/>
         <AnimatedBg/>
         <motion.div  
