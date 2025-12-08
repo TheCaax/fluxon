@@ -142,7 +142,7 @@ export default function Imaging() {
           <div className="rounded-2xl p-6 shadow-2xl">
             <div className="flex items-center justify-center flex-col">
               <div>
-                <h1 className="text-4xl font-bold mb-1 bg-linear-to-r from-red-900 via-green-400 to-blue-800 bg-clip-text text-transparent">
+                <h1 className="text-4xl font-bold mb-1 bg-linear-to-r from-red-400 via-green-400 to-blue-600 bg-clip-text text-transparent">
                   Convert to Image
                 </h1>
                 <p className="text-sm text-gray-400">
