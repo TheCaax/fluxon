@@ -63,7 +63,7 @@ export default function About() {
             <div className="mb-6">
               <GradientText size="3xl">
                 {/* About Me <span className='text-xl'>(fluxon)</span> */}
-                Math er Don Vipo
+                Behind The Thought
               </GradientText>
             </div>
 
