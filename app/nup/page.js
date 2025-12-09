@@ -7,6 +7,7 @@ import { useState, useRef } from "react";
 import { composeNUp } from "@/libs/nup";
 import { toast } from "sonner";
 import Footer from "@/components/Footer";
+import StarTwinkle from "@/components/StarTwinkle";
 
 const PRESETS = [
   { value: "10", label: "10-up (2 × 5)", rows: 5, cols: 2 },
@@ -46,7 +47,7 @@ export default function Nup() {
     const newFiles = Array.from(e.target.files || []);
     setFiles((prev) => [...prev, ...newFiles]);
     if (fileInputRef.current) fileInputRef.current.value = "";
-    toast.info(`${newFiles.length} new files found!`)
+    toast.info(`${newFiles.length} files selected!`)
   };
 
   const moveFile = (idx, direction) => {
@@ -59,6 +60,7 @@ export default function Nup() {
 
   const removeFile = (idx) => {
     setFiles(files.filter((_, i) => i !== idx));
+    toast.info('File Removed!')
   };
 
   const handlePresetChange = (value) => {
@@ -68,11 +70,12 @@ export default function Nup() {
       setRows(selected.rows);
       setCols(selected.cols);
     }
+    toast.info(`Preset changed to ${selected.label}`)
   };
 
   const handleCompose = async () => {
     if (!files.length) {
-      alert("Please select PDF files first");
+      toast.warning("Please select PDF files first");
       return;
     }
 
@@ -92,7 +95,7 @@ export default function Nup() {
           dpi: Math.max(72, parseInt(dpi) || 150),
           paper,
           orientation,
-          outputName: outputName.replace(/\s+/g, "_") || "nup_compose_output",
+          outputName: outputName.replace(/\s+/g, "_") || `compose_output`,
         },
         ({ status, progress }) => {
           setStatus(status);
@@ -126,7 +129,7 @@ export default function Nup() {
       }, 2000);
     } catch (err) {
       console.error(err);
-      alert(`Error: ${err.message}`);
+      toast.error(`Error: ${err.message}`);
       setStatus("Error");
     } finally {
       setProcessing(false);
@@ -142,6 +145,7 @@ export default function Nup() {
     <title>Compose - Make your pdf printer-friendly | Fluxon</title>
       <Navbar />
       <AnimatedBg />
+      <StarTwinkle/>
       <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}

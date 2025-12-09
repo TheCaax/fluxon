@@ -12,6 +12,7 @@ import {
   downloadBlob,
 } from "@/libs/merge";
 import { toast } from "sonner";
+import StarTwinkle from "@/components/StarTwinkle";
 
 export default function Merge() {
   const [files, setFiles] = useState([]);
@@ -41,7 +42,7 @@ export default function Merge() {
 
     setFiles((prev) => [...prev, ...newFiles]);
     e.target.value = "";
-    toast.info(`${pdfFiles.length} files found!`);
+    toast.info(`${pdfFiles.length} files selected!`);
   };
 
   const moveFile = (index, direction) => {
@@ -59,6 +60,7 @@ export default function Merge() {
 
   const removeFile = (index) => {
     setFiles((prev) => prev.filter((_, i) => i !== index));
+    toast.info('File Removed!')
   };
 
   const handleMerge = async () => {
@@ -134,6 +136,7 @@ export default function Merge() {
     <title>Merge - merge your pdfs into onefile | Fluxon</title>
       <Navbar />
       <AnimatedBg />
+      <StarTwinkle/>
       <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
@@ -149,7 +152,7 @@ export default function Merge() {
                 Merge & Color Inversion
               </h1>
               <p className="text-sm text-cyan-100 mt-1">
-                You can invert colors and merge them here
+                Make sure that your files are not corrupt
               </p>
             </div>
 
@@ -190,7 +193,7 @@ export default function Merge() {
           </header>
 
           {/* Main Panel */}
-          <section className="p-5 rounded-2xl backdrop-blur-md bg-linear-to-b from-white/2 to-white/1 border border-white/6 shadow-2xl">
+          <section className="p-5 text-left rounded-2xl backdrop-blur-md bg-linear-to-b from-white/2 to-white/1 border border-white/6 shadow-2xl">
             {/* File Input */}
             <label className="inline-block px-5 py-3.5 rounded-xl bg-linear-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-700 text-gray-950 cursor-pointer font-semibold mb-3 transition-all">
               <input
@@ -273,6 +276,7 @@ export default function Merge() {
                     className="w-4 h-4"
                   />
                   <span className="text-sm">Invert colors</span>
+      
                 </label>
 
                 {/* Output Name */}
@@ -283,6 +287,7 @@ export default function Merge() {
                   placeholder="Output filename (without extension)"
                   className="px-2.5 py-2 rounded-lg bg-transparent border border-white/4 text-gray-400 text-sm outline-none focus:border-white/9 transition-colors"
                 />
+                <span className="text-sm text-gray-600">(!) invert is under devl.</span>
               </div>
 
               {/* Merge Button */}
@@ -335,8 +340,8 @@ export default function Merge() {
               </li>
             </ol>
             <p className="text-xs text-gray-500 mt-3">
-              Note: Inversion renders pages to images (client-side) — it may be
-              slower for large PDFs.
+              Note: Inversion renders pages to images — it may be
+              slower for large PDFs. Also make sure that your PDF is not corrupt.
             </p>
           </section>
         </div>

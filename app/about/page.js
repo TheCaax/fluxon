@@ -15,6 +15,7 @@ import {
   Form,
   SquareSplitHorizontal,
 } from "lucide-react";
+import StarTwinkle from "@/components/StarTwinkle";
 
 const Colr = ({ text, color }) => {
   return <span style={{ color: color }}>{text}</span>;
@@ -48,6 +49,7 @@ export default function About() {
       <title>About - know the reason to build this | Fluxon</title>
       <Navbar />
       <AnimatedBg />
+      <StarTwinkle/>
       <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
@@ -61,7 +63,7 @@ export default function About() {
             <div className="mb-6">
               <GradientText size="3xl">
                 {/* About Me <span className='text-xl'>(fluxon)</span> */}
-                Behind The Thought
+                Math er Don Vipo
               </GradientText>
             </div>
 
@@ -114,8 +116,8 @@ export default function About() {
                 JavaScript and Next.js, with some AI assistance for tougher
                 parts. I’m completely free to use, with no paywalls or bloated
                 menus. My goal is to stay simple, fast, and practical for
-                everyday tasks. Even though my developer is preparing for a
-                medical career, he still built me with care and intention. I
+                everyday tasks. Even though my developer is preparing for
+                medical, he still built me with care and intention. I
                 exist to save you time and reduce the friction of operating
                 PDFs. Put me to use—I’m here to make your workflow smoother.
               </p>
@@ -178,7 +180,7 @@ export default function About() {
                 ></div>
               </div>
 
-              <h2 className="mt-15 text-4xl bg-clip-text font-semibold text-amber-500 mb-4">
+              <h2 className="mt-15 text-4xl bg-clip-text font-semibold text-cyan-500 mb-4">
                 A Message for You
               </h2>
               <p className="m-6 leading-relaxed opacity-90">
@@ -187,7 +189,7 @@ export default function About() {
                 "as-is," meaning I come without any formal guarantees.{" "}
                 <Colr
                   text={
-                    "Please use trusted one if you know that you may fallen into problem"
+                    "Please use trusted sites if you know that you may fallen into problem"
                   }
                   color={"limegreen"}
                 />

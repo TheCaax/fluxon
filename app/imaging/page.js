@@ -6,6 +6,8 @@ import AnimatedBg from "@/components/AnimatedBg";
 import { useState, useRef } from "react";
 import { pdfToImages, getPageCount, convertPageRanges, downloadAsZip } from "@/libs/imaging";
 import Footer from "@/components/Footer";
+import { toast } from "sonner";
+import StarTwinkle from "@/components/StarTwinkle";
 
 export default function Imaging() {
   const [file, setFile] = useState(null);
@@ -42,8 +44,9 @@ export default function Imaging() {
       setTotalPages(pageCount);
     } catch (err) {
       console.error("Error reading PDF:", err);
-      alert("Error reading PDF file");
+      toast.error("Error reading PDF file");
     }
+    toast.success(`${e.target.files?.[0].name} file uploaded!`)
   };
 
   const resetForm = () => {
@@ -53,24 +56,27 @@ export default function Imaging() {
       setProgress(0);
       setStatus("Idle");
       setProcessing(false);
+      setOutputPrefix('pages');
       if (fileInputRef.current) fileInputRef.current.value = "";
     }, 2500);
   };
 
   const handleConvert = async () => {
     if (!file) {
-      alert("Please select a PDF file first");
+      toast.error("Please select a PDF file first");
       return;
     }
 
     if (!totalPages || totalPages === 0) {
-      alert("Please wait for the PDF to load completely");
+      toast.error("Please wait for the PDF to load completely");
       return;
     }
 
     setProcessing(true);
     setProgress(0);
     setStatus("Starting...");
+
+    toast.info('Processing...')
 
     try {
       let results = [];
@@ -117,7 +123,7 @@ export default function Imaging() {
       resetForm();
     } catch (err) {
       console.error(err);
-      alert(`Error: ${err.message}`);
+      toast.error(`Error: ${err.message}`);
       setStatus("Error");
       setProcessing(false);
     }
@@ -129,6 +135,7 @@ export default function Imaging() {
     <>
     <title>Imaging - convert pdfs to images for your need | Fluxon</title>
       <Navbar />
+      <StarTwinkle/>
       <AnimatedBg />
       <motion.div
         initial={{ opacity: 0, y: 15 }}

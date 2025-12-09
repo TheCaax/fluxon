@@ -7,6 +7,7 @@ import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import StarTwinkle from "@/components/StarTwinkle";
 
 export default function Overview() {
   const router = useRouter();
@@ -62,6 +63,7 @@ export default function Overview() {
       >
         {/* Animated background gradient */}
         <AnimatedBg />
+        <StarTwinkle/>
 
         {/* Hero Section */}
         <section className="relative min-h-screen flex items-center justify-center px-6 pt-20">
@@ -183,6 +185,11 @@ export default function Overview() {
             </div>
           </div>
         </section>
+        {/* Quote Block (Replicates your landing page card style) */}
+          <div className="max-w-7xl m-auto mb-10 text-center flex justify-center items-center p-4 border border-indigo-500/30 bg-indigo-500/5 rounded-lg text-lg opacity-85">
+            Suggestion: Please use Fluxon for non-essential PDF files that
+            contain no sensitive data.
+          </div>{" "}
       </motion.div>
       <Footer bridge={'Do more with your stuff'} name={'Overview'} />
     </>

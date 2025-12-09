@@ -5,7 +5,9 @@ import { splitPDF, splitByRanges, downloadAsZip } from "@/libs/split";
 import { motion } from "framer-motion";
 import AnimatedBg from "@/components/AnimatedBg";
 import Navbar from "@/components/Navbar";
+import { toast } from 'sonner';
 import Footer from "@/components/Footer";
+import StarTwinkle from "@/components/StarTwinkle";
 
 export default function SplitPage() {
   const [file, setFile] = useState(null);
@@ -33,6 +35,7 @@ export default function SplitPage() {
     if (!selectedFile) return;
 
     setFile(selectedFile);
+    toast.success(`Pdf selected!`)
 
     // Get page count
     try {
@@ -87,25 +90,28 @@ export default function SplitPage() {
       setTotalPages(0);
       setProgress(0);
       setStatus("Idle");
-      setProcessing(false)
+      setRanges('1-3, 5, 7-10');
+      setProcessing(false);
+      setOutputPrefix("");
       if (fileInputRef.current) fileInputRef.current.value = "";
     }, 2500);
   };
 
   const handleSplit = async () => {
     if (!file) {
-      alert("Please select a PDF file first");
+      toast.error("Please select a PDF file first");
       return;
     }
 
     if (!totalPages || totalPages === 0) {
-      alert("Please wait for the PDF to load completely");
+      toast.error("Please wait for the PDF to load completely");
       return;
     }
 
     setProcessing(true);
     setProgress(0);
     setStatus("Starting...");
+    toast.success('Processing...')
 
     try {
       let results = [];
@@ -159,7 +165,7 @@ export default function SplitPage() {
       resetForm();
     } catch (err) {
       console.error(err);
-      alert(`Error: ${err.message}`);
+      toast.error(`Error: ${err.message}`);
       setStatus("Error");
       setProcessing(false);
     }
@@ -170,6 +176,7 @@ export default function SplitPage() {
     <title>Split - cut pdfs into pieces | Fluxon</title>
     <Navbar/>
     <AnimatedBg/>
+    <StarTwinkle/>
     <motion.div initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -15 }}
@@ -253,6 +260,7 @@ export default function SplitPage() {
                       setFile(null);
                       setTotalPages(0);
                       if (fileInputRef.current) fileInputRef.current.value = "";
+                      toast.success('File Removed!')
                     }}
                     className="px-2 py-1 text-red-400 hover:text-red-300 transition-colors"
                   >
