@@ -17,56 +17,67 @@ export default function StarTwinkle() {
     resize();
     window.addEventListener("resize", resize);
 
-    // Create stars
-    const makeStars = (count, sizeRange, driftSpeed) =>
-      Array.from({ length: count }).map(() => ({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        radius: sizeRange[0] + Math.random() * sizeRange[1],
-        baseAlpha: 0.1 + Math.random() * 0.3,  // faint default brightness
-        alpha: 0,
-        sparkle: 0, // sparkle state
-        driftX: (Math.random() - 0.5) * driftSpeed,
-        driftY: (Math.random() - 0.5) * driftSpeed
-      }));
+    // CONFIG — tweak these to control performance
+    const STAR_COUNT_BG = 120;   // decrease/increase density
+    const STAR_COUNT_FG = 60;
+    const SPARKLE_CHANCE = 0.005; // smaller = less sparkle
+    const SPARKLE_FADE = 0.045;   // smaller = slower fade
+    const DRIFT_SPEED_BG = 0.015;
+    const DRIFT_SPEED_FG = 0.035;
 
-    const foreground = makeStars(80, [0.8, 1.4], 0.05);
-    const background = makeStars(150, [0.3, 0.5], 0.02);
+    // Generate stars with precomputed randoms (cheaper per frame)
+    const makeStars = (count, sizeRange, driftSpeed) =>
+      Array.from({ length: count }).map(() => {
+        const radius = sizeRange[0] + Math.random() * sizeRange[1];
+        return {
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          radius,
+          baseAlpha: 0.15 + Math.random() * 0.25,
+          alpha: 0,
+          sparkle: 0,
+          driftX: (Math.random() - 0.5) * driftSpeed,
+          driftY: (Math.random() - 0.5) * driftSpeed,
+        };
+      });
+
+    const background = makeStars(STAR_COUNT_BG, [0.2, 0.45], DRIFT_SPEED_BG);
+    const foreground = makeStars(STAR_COUNT_FG, [0.6, 1.2], DRIFT_SPEED_FG);
 
     const drawStars = (stars) => {
-      stars.forEach((s) => {
+      for (let i = 0; i < stars.length; i++) {
+        const s = stars[i];
 
-        // ⭐ STAR SPARKLE LOGIC ⭐
-        // small chance per frame to trigger sparkle
-        if (Math.random() < 0.008) {
-          s.sparkle = 1; // start bright flash
+        // Sparkle start
+        if (s.sparkle <= 0 && Math.random() < SPARKLE_CHANCE) {
+          s.sparkle = 1;
         }
 
+        // Sparkle fade
         if (s.sparkle > 0) {
-          // bright flash that fades quickly
           s.alpha = 0.9 * s.sparkle;
-          s.sparkle -= 0.06; // fade speed
+          s.sparkle -= SPARKLE_FADE;
         } else {
-          // idle faint shine
           s.alpha = s.baseAlpha;
         }
 
-        // drifting motion for realism
+        // Drift (no randomness inside frame loop — cheaper)
         s.x += s.driftX;
         s.y += s.driftY;
 
-        // wrap around edges
-        if (s.x < 0) s.x = canvas.width;
-        if (s.x > canvas.width) s.x = 0;
-        if (s.y < 0) s.y = canvas.height;
-        if (s.y > canvas.height) s.y = 0;
+        // Wrap edges (simple and cheap)
+        if (s.x < 0) s.x += canvas.width;
+        if (s.x > canvas.width) s.x -= canvas.width;
+        if (s.y < 0) s.y += canvas.height;
+        if (s.y > canvas.height) s.y -= canvas.height;
 
-        // draw star
+        // Draw
+        ctx.globalAlpha = s.alpha;
         ctx.beginPath();
         ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255,255,255,${s.alpha})`;
+        ctx.fillStyle = "#ffffff";
         ctx.fill();
-      });
+      }
     };
 
     const animate = () => {
@@ -86,7 +97,7 @@ export default function StarTwinkle() {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 w-full h-full pointer-events-none"
+      className="pointer-events-none fixed inset-0 w-full h-full"
     />
   );
 }

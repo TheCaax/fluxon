@@ -187,7 +187,7 @@ export default function SplitPage() {
           <div className="flex items-center justify-center flex-col text-center">
             <div>
               <h1 className="text-4xl font-bold mb-1 bg-linear-to-r from-red-900 via-green-400 to-blue-800 bg-clip-text text-transparent">
-                Split by  Three options
+                Split PDF
                 </h1>
               <p className="text-sm text-gray-400">
                 Split PDF into multiple files by pages or ranges
@@ -364,13 +364,13 @@ export default function SplitPage() {
           {/* Output filename prefix */}
           <div>
             <label className="block text-sm text-gray-400 mb-2">
-              Output filename prefix (optional)
+              Filename
             </label>
             <input
               type="text"
               value={outputPrefix}
               onChange={(e) => setOutputPrefix(e.target.value)}
-              placeholder="document"
+              placeholder="New Filename"
               className="w-full px-4 py-2.5 bg-gray-900/95 border border-white/10 rounded-xl text-gray-300 placeholder-gray-600 focus:outline-none focus:border-sky-400 transition-colors"
             />
           </div>

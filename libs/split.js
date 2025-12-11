@@ -1,190 +1,419 @@
+// libs/split.js
 import initLibraries from './version';
 import jsPDF from 'jspdf';
 
-// Split PDF into individual pages
-export const splitPDF = async (file, onProgress) => {
-  await initLibraries();
+let pdfjsLib = null;
 
-  onProgress({ status: 'Loading PDF...', progress: 10 });
-
-  const arrayBuffer = await file.arrayBuffer();
-  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-  const totalPages = pdf.numPages;
-
-  if (!totalPages) throw new Error('No pages found in PDF');
-
-  onProgress({ status: 'Splitting pages...', progress: 20 });
-
-  const results = [];
-
-  for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
-    const page = await pdf.getPage(pageNum);
-    const viewport = page.getViewport({ scale: 2.0 });
-
-    // Render page to canvas
-    const canvas = document.createElement('canvas');
-    canvas.width = viewport.width;
-    canvas.height = viewport.height;
-    const ctx = canvas.getContext('2d');
-
-    await page.render({ canvasContext: ctx, viewport }).promise;
-
-    // Create new PDF with this page
-    const imgData = canvas.toDataURL('image/jpeg', 0.95);
-    const pdf = new jsPDF({
-      orientation: viewport.width > viewport.height ? 'landscape' : 'portrait',
-      unit: 'px',
-      format: [viewport.width, viewport.height]
-    });
-
-    pdf.addImage(imgData, 'JPEG', 0, 0, viewport.width, viewport.height);
-    const blob = pdf.output('blob');
-
-    results.push({
-      blob,
-      filename: `page_${pageNum}.pdf`,
-      pageNum
-    });
-
-    const progress = 20 + Math.round((pageNum / totalPages) * 70);
-    onProgress({ 
-      status: `Split page ${pageNum}/${totalPages}`, 
-      progress 
-    });
-
-    await new Promise(r => setTimeout(r, 10));
-  }
-
-  pdf.destroy();
-  onProgress({ status: 'Complete!', progress: 100 });
-
-  return results;
-};
-
-// Split PDF by page ranges
-export const splitByRanges = async (file, ranges, onProgress) => {
-  await initLibraries();
-
-  onProgress({ status: 'Loading PDF...', progress: 10 });
-
-  const arrayBuffer = await file.arrayBuffer();
-  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-  const totalPages = pdf.numPages;
-
-  if (!totalPages) throw new Error('No pages found in PDF');
-
-  onProgress({ status: 'Processing ranges...', progress: 20 });
-
-  const results = [];
-  let processed = 0;
-  const totalRanges = ranges.length;
-
-  for (let rangeIdx = 0; rangeIdx < ranges.length; rangeIdx++) {
-    const range = ranges[rangeIdx];
-    const { start, end } = range;
-
-    if (start < 1 || end > totalPages || start > end) {
-      throw new Error(`Invalid range: ${start}-${end}`);
-    }
-
-    // Create new PDF for this range
-    let newPdf = null;
-
-    for (let pageNum = start; pageNum <= end; pageNum++) {
-      const page = await pdf.getPage(pageNum);
-      const viewport = page.getViewport({ scale: 2.0 });
-
-      const canvas = document.createElement('canvas');
-      canvas.width = viewport.width;
-      canvas.height = viewport.height;
-      const ctx = canvas.getContext('2d');
-
-      await page.render({ canvasContext: ctx, viewport }).promise;
-      const imgData = canvas.toDataURL('image/jpeg', 0.95);
-
-      if (!newPdf) {
-        newPdf = new jsPDF({
-          orientation: viewport.width > viewport.height ? 'landscape' : 'portrait',
-          unit: 'px',
-          format: [viewport.width, viewport.height]
-        });
-        newPdf.addImage(imgData, 'JPEG', 0, 0, viewport.width, viewport.height);
-      } else {
-        newPdf.addPage([viewport.width, viewport.height]);
-        newPdf.addImage(imgData, 'JPEG', 0, 0, viewport.width, viewport.height);
+// Initialize libraries if not already done
+async function ensurePDFJSInitialized() {
+  if (!pdfjsLib) {
+    // Use your existing initLibraries function
+    await initLibraries();
+    
+    // Get the pdfjsLib from the global scope or import it
+    // Assuming initLibraries sets up pdfjsLib globally or exports it
+    try {
+      // Try to import it directly if not available globally
+      const module = await import("pdfjs-dist/legacy/build/pdf.mjs");
+      pdfjsLib = module;
+      
+      // Set worker source
+      if (typeof window !== 'undefined') {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 
+          'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/5.0.375/pdf.worker.min.mjs';
       }
-
-      processed++;
-      const progress = 20 + Math.round((processed / ranges.reduce((sum, r) => sum + (r.end - r.start + 1), 0)) * 70);
-      onProgress({ 
-        status: `Processing range ${rangeIdx + 1}/${totalRanges}, page ${pageNum}`, 
-        progress 
-      });
-
-      await new Promise(r => setTimeout(r, 10));
+    } catch (error) {
+      console.error('Failed to load PDF.js:', error);
+      throw new Error('Failed to load PDF library. Please try again.');
     }
-
-    const blob = newPdf.output('blob');
-    results.push({
-      blob,
-      filename: start === end ? `page_${start}.pdf` : `pages_${start}-${end}.pdf`,
-      range: `${start}-${end}`
-    });
   }
+  return pdfjsLib;
+}
 
-  pdf.destroy();
-  onProgress({ status: 'Complete!', progress: 100 });
+// Common function to validate and load PDF
+async function loadPDF(file) {
+  const pdfjs = await ensurePDFJSInitialized();
+  
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjs.getDocument({ 
+      data: arrayBuffer,
+      useWorkerFetch: false,
+      isEvalSupported: false,
+      useSystemFonts: true
+    }).promise;
+    
+    return pdf;
+  } catch (error) {
+    console.error('Error loading PDF:', error);
+    throw new Error(`Failed to load PDF: ${error.message}`);
+  }
+}
 
-  return results;
+// Clean up resources
+function cleanupResources(pdf, canvases = []) {
+  try {
+    if (pdf && typeof pdf.destroy === 'function') {
+      pdf.destroy();
+    }
+  } catch (error) {
+    console.warn('Error destroying PDF:', error);
+  }
+  
+  // Remove canvases from DOM
+  canvases.forEach(canvas => {
+    try {
+      if (canvas && canvas.parentNode) {
+        canvas.parentNode.removeChild(canvas);
+      }
+    } catch (error) {
+      console.warn('Error removing canvas:', error);
+    }
+  });
+}
+
+/**
+ * Render PDF page to canvas
+ */
+async function renderPageToCanvas(page, scale = 2.0) {
+  const viewport = page.getViewport({ scale });
+  
+  // Create canvas
+  const canvas = document.createElement('canvas');
+  canvas.width = viewport.width;
+  canvas.height = viewport.height;
+  canvas.style.display = 'none'; // Hide from DOM
+  
+  // Add to DOM for rendering (required for some PDF.js operations)
+  if (document.body) {
+    document.body.appendChild(canvas);
+  }
+  
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  if (!ctx) {
+    throw new Error('Failed to get canvas context');
+  }
+  
+  // Fill with white background to handle transparent PDFs
+  ctx.fillStyle = 'white';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  try {
+    await page.render({
+      canvasContext: ctx,
+      viewport: viewport,
+    }).promise;
+  } catch (renderError) {
+    console.error('Error rendering page:', renderError);
+    throw new Error(`Failed to render page: ${renderError.message}`);
+  }
+  
+  return { canvas, viewport };
+}
+
+/**
+ * Create PDF from canvas
+ */
+function createPDFFromCanvas(canvas, viewport) {
+  const imgData = canvas.toDataURL('image/jpeg', 0.92);
+  
+  const orientation = viewport.width > viewport.height ? 'landscape' : 'portrait';
+  const pdf = new jsPDF({
+    orientation: orientation,
+    unit: 'px',
+    format: [viewport.width, viewport.height],
+    compress: true
+  });
+  
+  pdf.addImage(imgData, 'JPEG', 0, 0, viewport.width, viewport.height);
+  return pdf;
+}
+
+/**
+ * Split PDF into individual pages
+ */
+export const splitPDF = async (file, onProgress) => {
+  let pdf = null;
+  const canvases = [];
+  
+  try {
+    onProgress?.({ status: 'Loading PDF...', progress: 10 });
+    
+    // Load PDF
+    pdf = await loadPDF(file);
+    const totalPages = pdf.numPages;
+    
+    if (!totalPages || totalPages === 0) {
+      throw new Error('No pages found in PDF');
+    }
+    
+    onProgress?.({ status: `Splitting ${totalPages} pages...`, progress: 20 });
+    
+    const results = [];
+    
+    for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+      try {
+        // Get page
+        const page = await pdf.getPage(pageNum);
+        
+        // Render to canvas
+        const { canvas, viewport } = await renderPageToCanvas(page, 2.0);
+        canvases.push(canvas);
+        
+        // Create PDF from canvas
+        const pagePDF = createPDFFromCanvas(canvas, viewport);
+        const blob = pagePDF.output('blob');
+        
+        results.push({
+          blob,
+          filename: `page_${pageNum}.pdf`,
+          pageNum
+        });
+        
+        // Update progress
+        const progress = 20 + Math.round((pageNum / totalPages) * 70);
+        onProgress?.({
+          status: `Processed page ${pageNum}/${totalPages}`,
+          progress
+        });
+        
+        // Small delay to prevent blocking UI (only for large files)
+        if (pageNum % 5 === 0 && totalPages > 10) {
+          await new Promise(resolve => setTimeout(resolve, 10));
+        }
+      } catch (pageError) {
+        console.error(`Error processing page ${pageNum}:`, pageError);
+        throw new Error(`Failed to process page ${pageNum}: ${pageError.message}`);
+      }
+    }
+    
+    onProgress?.({ status: 'Complete!', progress: 100 });
+    return results;
+    
+  } catch (error) {
+    console.error('Error in splitPDF:', error);
+    throw error;
+  } finally {
+    cleanupResources(pdf, canvases);
+  }
 };
 
-// Download all files as ZIP
+/**
+ * Split PDF by page ranges
+ */
+export const splitByRanges = async (file, ranges, onProgress) => {
+  let pdf = null;
+  const canvases = [];
+  
+  try {
+    onProgress?.({ status: 'Loading PDF...', progress: 10 });
+    
+    // Load PDF
+    pdf = await loadPDF(file);
+    const totalPages = pdf.numPages;
+    
+    if (!totalPages || totalPages === 0) {
+      throw new Error('No pages found in PDF');
+    }
+    
+    // Validate ranges
+    const validRanges = ranges.filter(range => 
+      range.start >= 1 && 
+      range.end <= totalPages && 
+      range.start <= range.end
+    );
+    
+    if (validRanges.length === 0) {
+      throw new Error('No valid page ranges specified');
+    }
+    
+    onProgress?.({ status: `Processing ${validRanges.length} range(s)...`, progress: 20 });
+    
+    const results = [];
+    let processedRanges = 0;
+    let totalProcessedPages = 0;
+    const totalPagesToProcess = validRanges.reduce((sum, range) => 
+      sum + (range.end - range.start + 1), 0
+    );
+    
+    for (const range of validRanges) {
+      try {
+        const { start, end } = range;
+        let rangePDF = null;
+        
+        for (let pageNum = start; pageNum <= end; pageNum++) {
+          // Get page
+          const page = await pdf.getPage(pageNum);
+          
+          // Render to canvas
+          const { canvas, viewport } = await renderPageToCanvas(page, 2.0);
+          canvases.push(canvas);
+          
+          // Create PDF from canvas
+          const imgData = canvas.toDataURL('image/jpeg', 0.92);
+          
+          if (!rangePDF) {
+            // First page in range
+            rangePDF = new jsPDF({
+              orientation: viewport.width > viewport.height ? 'landscape' : 'portrait',
+              unit: 'px',
+              format: [viewport.width, viewport.height],
+              compress: true
+            });
+            rangePDF.addImage(imgData, 'JPEG', 0, 0, viewport.width, viewport.height);
+          } else {
+            // Add page to existing PDF
+            rangePDF.addPage([viewport.width, viewport.height], 
+                            viewport.width > viewport.height ? 'landscape' : 'portrait');
+            rangePDF.addImage(imgData, 'JPEG', 0, 0, viewport.width, viewport.height);
+          }
+          
+          // Update progress
+          totalProcessedPages++;
+          const progress = 20 + Math.round((totalProcessedPages / totalPagesToProcess) * 70);
+          onProgress?.({
+            status: `Processing range ${processedRanges + 1}/${validRanges.length}, page ${pageNum}`,
+            progress
+          });
+          
+          // Small delay to prevent blocking UI
+          if (totalProcessedPages % 5 === 0 && totalPagesToProcess > 10) {
+            await new Promise(resolve => setTimeout(resolve, 10));
+          }
+        }
+        
+        // Save the range PDF
+        if (rangePDF) {
+          const blob = rangePDF.output('blob');
+          const filename = start === end 
+            ? `page_${start}.pdf` 
+            : `pages_${start}-${end}.pdf`;
+          
+          results.push({
+            blob,
+            filename,
+            range: `${start}-${end}`
+          });
+        }
+        
+        processedRanges++;
+        
+      } catch (rangeError) {
+        console.error(`Error processing range ${range.start}-${range.end}:`, rangeError);
+        throw new Error(`Failed to process range ${range.start}-${range.end}: ${rangeError.message}`);
+      }
+    }
+    
+    onProgress?.({ status: 'Complete!', progress: 100 });
+    return results;
+    
+  } catch (error) {
+    console.error('Error in splitByRanges:', error);
+    throw error;
+  } finally {
+    cleanupResources(pdf, canvases);
+  }
+};
+
+/**
+ * Download all files as ZIP
+ */
 export const downloadAsZip = async (files, zipName = 'split_pdfs.zip', onProgress) => {
   try {
-    // Dynamically import JSZip
+    // Dynamically import JSZip to reduce bundle size
     const JSZip = (await import('jszip')).default;
     const zip = new JSZip();
-
-    // Add files to zip
+    
+    onProgress?.({ 
+      status: 'Preparing ZIP file...', 
+      progress: 5 
+    });
+    
+    // Add files to ZIP
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
+      
+      // Add file with its data
       zip.file(file.filename, file.blob);
       
+      // Update progress
       if (onProgress) {
-        const progress = Math.round((i / files.length) * 100);
+        const progress = Math.round(((i + 1) / files.length) * 85) + 5;
         onProgress({
-          status: `Adding files to ZIP... (${i + 1}/${files.length})`,
+          status: `Adding ${file.filename} (${i + 1}/${files.length})`,
           progress
         });
       }
+      
+      // Small delay for large batches
+      if (i % 10 === 0 && files.length > 20) {
+        await new Promise(resolve => setTimeout(resolve, 10));
+      }
     }
-
-    // Generate ZIP and download
-    if (onProgress) {
-      onProgress({
-        status: 'Generating ZIP file...',
-        progress: 95
-      });
-    }
-
-    const zipBlob = await zip.generateAsync({ type: 'blob' });
+    
+    onProgress?.({ 
+      status: 'Generating ZIP...', 
+      progress: 95 
+    });
+    
+    // Generate ZIP blob
+    const zipBlob = await zip.generateAsync({ 
+      type: 'blob',
+      compression: 'DEFLATE',
+      compressionOptions: { level: 6 }
+    });
+    
+    // Create download link
     const url = URL.createObjectURL(zipBlob);
     const link = document.createElement('a');
     link.href = url;
     link.download = zipName;
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    
+    // Trigger download
     link.click();
     
-    await new Promise(r => setTimeout(r, 100));
-    URL.revokeObjectURL(url);
+    // Cleanup
+    setTimeout(() => {
+      try {
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      } catch (cleanupError) {
+        console.warn('Error during cleanup:', cleanupError);
+      }
+    }, 100);
+    
+    onProgress?.({ 
+      status: 'Download complete!', 
+      progress: 100 
+    });
+    
+    return true;
+    
+  } catch (error) {
+    console.error('Error creating ZIP:', error);
+    throw new Error(`Failed to create ZIP file: ${error.message}`);
+  }
+};
 
-    if (onProgress) {
-      onProgress({
-        status: 'ZIP downloaded successfully!',
-        progress: 100
-      });
-    }
-  } catch (err) {
-    console.error('Error creating ZIP:', err);
-    throw new Error(`Failed to create ZIP: ${err.message}`);
+// Utility function to get total pages of a PDF
+export const getPDFPageCount = async (file) => {
+  try {
+    const pdfjs = await ensurePDFJSInitialized();
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjs.getDocument({ 
+      data: arrayBuffer,
+      useWorkerFetch: false,
+      isEvalSupported: false,
+      useSystemFonts: true
+    }).promise;
+    
+    const pageCount = pdf.numPages;
+    pdf.destroy();
+    return pageCount;
+  } catch (error) {
+    console.error('Error getting PDF page count:', error);
+    throw new Error(`Failed to get PDF information: ${error.message}`);
   }
 };

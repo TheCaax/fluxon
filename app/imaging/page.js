@@ -20,7 +20,7 @@ export default function Imaging() {
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState("Idle");
   const [processing, setProcessing] = useState(false);
-  const [outputPrefix, setOutputPrefix] = useState("page");
+  const [outputPrefix, setOutputPrefix] = useState("");
 
   const fileInputRef = useRef(null);
 
@@ -344,13 +344,13 @@ export default function Imaging() {
             {/* Output Prefix */}
             <div>
               <label className="block text-sm text-gray-400 mb-2">
-                Output filename prefix
+                Filename
               </label>
               <input
                 type="text"
                 value={outputPrefix}
                 onChange={(e) => setOutputPrefix(e.target.value)}
-                placeholder="page"
+                placeholder="New Filename"
                 className="w-full px-4 py-2.5 bg-gray-900/95 border border-white/10 rounded-xl text-gray-300 placeholder-gray-600 focus:outline-none focus:border-sky-400 transition-colors"
               />
             </div>
@@ -417,7 +417,7 @@ export default function Imaging() {
           </div>
         </div>
       </motion.div>
-      <Footer name={'Imaging'} bridge={'Few features but relevant, I think...'}/>
+      <Footer name={'Imaging'} bridge={'Few features but relevant'}/>
     </>
   );
 }

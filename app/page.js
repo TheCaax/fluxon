@@ -80,21 +80,21 @@ export default function Overview() {
             </div>
 
             {/* Main heading with gradient animation */}
-            <h1 className="text-3xl md:text-7xl font-bold mb-6 leading-tight">
-              A{" "}
-              <span className="bg-linear-to-r from-cyan-400 via-pink-400 to-red-400 bg-clip-text text-transparent animate-pulse">
-                Minimal
+            <h1 className="text-2xl md:text-7xl font-bold mb-6 leading-tight">
+              {" "}
+              <span className="bg-linear-to-r from-cyan-400 via-pink-400 to-emerald-400 bg-clip-text text-transparent animate-pulse">
+                A Minimal
               </span>{" "}
               <span className="bg-linear-to-r from-green-400 via-yellow-400 to-red-400 bg-clip-text text-transparent animate-pulse">
                 {" "}
                 Solution
               </span>
               <br />
+              <span className="bg-linear-to-r from-pink-500 via-blue-400 to-green-400 bg-clip-text text-transparent animate-pulse">
               for your{" "}
-              <span className="bg-linear-to-r from-purple-400 via-blue-400 to-green-400 bg-clip-text text-transparent animate-pulse">
-                Academic{" "}
-              </span>
+              Academic{" "}
               stuffs
+              </span>
               <span className="text-cyan-400">.</span>
             </h1>
 
@@ -102,14 +102,14 @@ export default function Overview() {
             <p className="text-lg md:text-xl text-gray-300 max-w-4xl mx-auto mb-12 leading-relaxed backdrop-blur-sm bg-white/5 p-6 rounded-2xl border border-white/10">
               Transform pages into seamless narratives with unmatched precision.
               Harness the predictable power of client-side PDF manipulation,
-              where every merge, split, and pdf2image occurs with acceleration
+              where every merge, split, and pdf to image occurs with acceleration
               and privacy.
             </p>
 
             {/* CTA Button with enhanced effects */}
             <button
               onClick={() => router.push("/about")}
-              className="group relative px-8 py-4 rounded-full bg-linear-to-r from-purple-500 to-red-500 hover:from-green-400 hover:to-emerald-400 text-white font-semibold text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-green-500/50 overflow-hidden"
+              className="group relative px-8 py-4 rounded-full bg-linear-to-r from-cyan-500 to-red-500 hover:from-green-400 hover:to-emerald-400 text-white font-semibold text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-green-500/50 overflow-hidden"
             >
               <span className="relative z-10 flex items-center space-x-2">
                 <span>Why this is?</span>

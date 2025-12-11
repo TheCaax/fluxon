@@ -191,7 +191,7 @@ export default function About() {
                   text={
                     "Please use trusted sites if you know that you may fallen into problem"
                   }
-                  color={"limegreen"}
+                  color={"pink"}
                 />
                 . I cannot be held responsible if something goes wrong—like a
                 rare system glitch, file corruption, or data loss.
@@ -207,7 +207,7 @@ export default function About() {
             </div>
           </section>
           {/* ➡️ Optional: Call to Action */}
-          <section className="flex justify-center items-center flex-row mt-20">
+          <section className="flex justify-center items-center flex-row mt-10">
             <Link
               href="/"
               className="m-2 flex py-3 px-8 text-lg font-semibold rounded-full shadow-lg transition duration-300 ease-in-out 
@@ -216,11 +216,6 @@ export default function About() {
               <HomeIcon className="text-amber-400 mr-5" /> Go to Home &rarr;
             </Link>
           </section>
-          {/* Quote Block (Replicates your landing page card style) */}
-          <div className="mt-8 p-4 border border-indigo-500/30 bg-indigo-500/5 rounded-lg text-lg italic opacity-85">
-            Suggestion: Please use Fluxon for non-essential PDF files that
-            contain no credential or sensitive informations.
-          </div>{" "}
         </main>
       </motion.div>
       <Footer bridge={"I appreciate your interest"} name={"About"} />

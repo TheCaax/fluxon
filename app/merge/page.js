@@ -284,10 +284,10 @@ export default function Merge() {
                   type="text"
                   value={outputName}
                   onChange={(e) => setOutputName(e.target.value)}
-                  placeholder="Output filename (without extension)"
-                  className="px-2.5 py-2 rounded-lg bg-transparent border border-white/4 text-gray-400 text-sm outline-none focus:border-white/9 transition-colors"
+                  placeholder="New Filename"
+                  className="px-2.5 py-2 rounded-lg bg-transparent border border-white/4 text-gray-400 text-sm outline-none focus:border-cyan-600 transition-colors"
                 />
-                <span className="text-sm text-gray-600">(!) invert is under devl.</span>
+                <span className="text-sm text-red-300">(This may take time and memory)</span>
               </div>
 
               {/* Merge Button */}

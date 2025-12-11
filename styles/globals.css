@@ -15,7 +15,7 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: "Jetbrain";
+  font-family: "Jetbrain", sans-serif;
 }
 
 /* edits */
