@@ -17,9 +17,9 @@ export default function AnimatedBg() {
     window.addEventListener("resize", resize);
 
     // CONFIG — tweak these
-    const BURST_PARTICLES = 50; // lower = less dense
-    const PARTICLE_FADE = 0.01; // lower = slower fade & longer life
-    const PARTICLE_SPEED = 0.5; // lower = slower movement
+    const BURST_PARTICLES = 30; // lower = less dense
+    const PARTICLE_FADE = 0.009; // lower = slower fade & longer life
+    const PARTICLE_SPEED = 0.3; // lower = slower movement
     const COLOR = "0, 255, 25"; // lime green
 
     let lastBurst = 0;
