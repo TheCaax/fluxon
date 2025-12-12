@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { GradientInkBackground, MouseAnimation } from "@/components/Animation";
 import Navbar from "@/components/Navbar";
 import { motion } from "framer-motion";
-import AnimatedBg from "@/components/AnimatedBg";
 import Footer from "@/components/Footer";
 import GradientText from "@/components/GradientText";
 import Link from "next/link";
@@ -15,7 +14,6 @@ import {
   Form,
   SquareSplitHorizontal,
 } from "lucide-react";
-import StarTwinkle from "@/components/StarTwinkle";
 
 const Colr = ({ text, color }) => {
   return <span style={{ color: color }}>{text}</span>;
@@ -48,8 +46,8 @@ export default function About() {
     <>
       <title>About - know the reason to build this | Fluxon</title>
       <Navbar />
-      <AnimatedBg />
-      <StarTwinkle/>
+      <GradientInkBackground/>
+      <MouseAnimation/>
       <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}

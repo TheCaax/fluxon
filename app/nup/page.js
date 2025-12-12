@@ -1,13 +1,12 @@
 "use client";
 
+import { GradientInkBackground, MouseAnimation } from "@/components/Animation";
 import Navbar from "@/components/Navbar";
 import { motion } from "framer-motion";
-import AnimatedBg from "@/components/AnimatedBg";
 import { useState, useRef } from "react";
 import { composeNUp } from "@/libs/nup";
 import { toast } from "sonner";
 import Footer from "@/components/Footer";
-import StarTwinkle from "@/components/StarTwinkle";
 
 const PRESETS = [
   { value: "10", label: "10-up (2 × 5)", rows: 5, cols: 2 },
@@ -144,8 +143,8 @@ export default function Nup() {
     <>
     <title>Compose - Make your pdf printer-friendly | Fluxon</title>
       <Navbar />
-      <AnimatedBg />
-      <StarTwinkle/>
+      <GradientInkBackground/>
+      <MouseAnimation/>
       <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}

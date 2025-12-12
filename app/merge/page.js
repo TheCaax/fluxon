@@ -2,7 +2,6 @@
 
 import Navbar from "@/components/Navbar";
 import { motion } from "framer-motion";
-import AnimatedBg from "@/components/AnimatedBg";
 import { useState, useRef } from "react";
 import Footer from "@/components/Footer";
 import {
@@ -12,7 +11,7 @@ import {
   downloadBlob,
 } from "@/libs/merge";
 import { toast } from "sonner";
-import StarTwinkle from "@/components/StarTwinkle";
+import { GradientInkBackground, MouseAnimation } from "@/components/Animation";
 
 export default function Merge() {
   const [files, setFiles] = useState([]);
@@ -135,8 +134,8 @@ export default function Merge() {
     <>
     <title>Merge - merge your pdfs into onefile | Fluxon</title>
       <Navbar />
-      <AnimatedBg />
-      <StarTwinkle/>
+      <GradientInkBackground/>
+      <MouseAnimation/>
       <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}

@@ -1,5 +1,7 @@
-import initLibraries from "./version";
-import jsPDF from "jspdf";
+import initLibraries, { getPDFJSLib, getJsPDF } from "./version";
+
+let pdfjsLib = null;
+let jsPDF = null;
 
 // Paper sizes in mm
 const PAPER_MM = {
@@ -9,6 +11,17 @@ const PAPER_MM = {
 
 // Convert mm to pixels using DPI
 const mmToPx = (mm, dpi) => Math.round(mm * (dpi / 25.4));
+
+/**
+ * Initialize libraries for N-Up operation
+ */
+const initNUpLibraries = async () => {
+  if (!pdfjsLib || !jsPDF) {
+    await initLibraries();
+    pdfjsLib = await getPDFJSLib();
+    jsPDF = await getJsPDF();
+  }
+};
 
 // Collect all pages from PDF files
 const collectAllPages = async (files) => {
@@ -23,7 +36,7 @@ const collectAllPages = async (files) => {
 
 // Main composition function
 export const composeNUp = async (config, onProgress) => {
-  await initLibraries();
+  await initNUpLibraries();
 
   const {
     files,

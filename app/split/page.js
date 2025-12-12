@@ -2,12 +2,11 @@
 
 import { useState, useRef } from "react";
 import { splitPDF, splitByRanges, downloadAsZip } from "@/libs/split";
+import { GradientInkBackground, MouseAnimation } from "@/components/Animation";
 import { motion } from "framer-motion";
-import AnimatedBg from "@/components/AnimatedBg";
 import Navbar from "@/components/Navbar";
 import { toast } from 'sonner';
 import Footer from "@/components/Footer";
-import StarTwinkle from "@/components/StarTwinkle";
 
 export default function SplitPage() {
   const [file, setFile] = useState(null);
@@ -175,12 +174,12 @@ export default function SplitPage() {
     <>
     <title>Split - cut pdfs into pieces | Fluxon</title>
     <Navbar/>
-    <AnimatedBg/>
-    <StarTwinkle/>
+    <GradientInkBackground/>
+    <MouseAnimation/>
     <motion.div initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -15 }}
-        transition={{ duration: 0.2 }} className="mt-20 min-h-screen bg-linear-to-br from-gray-950 via-gray-900 to-gray-950 text-gray-100 p-6">
+        transition={{ duration: 0.2 }} className="mt-20 min-h-screen text-gray-100 p-6">
       <div className="max-w-5xl mx-auto space-y-6">
         {/* Header */}
         <div className="rounded-2xl p-6">

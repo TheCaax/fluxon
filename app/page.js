@@ -2,12 +2,11 @@
 
 import {FileText, Sparkles, Lock, Zap, ArrowRight, ArrowDownIcon} from "lucide-react";
 import React, { useState, useEffect } from "react";
-import AnimatedBg from "@/components/AnimatedBg";
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import StarTwinkle from "@/components/StarTwinkle";
+import { GradientInkBackground, MouseAnimation } from "@/components/Animation";
 
 export default function Overview() {
   const router = useRouter();
@@ -62,8 +61,8 @@ export default function Overview() {
         className="min-h-screen overflow-hidden"
       >
         {/* Animated background gradient */}
-        <AnimatedBg />
-        <StarTwinkle/>
+        <GradientInkBackground/>
+        <MouseAnimation/>
 
         {/* Hero Section */}
         <section className="relative min-h-screen flex items-center justify-center px-6 pt-20">

@@ -1,31 +1,17 @@
 // libs/split.js
-import initLibraries from './version';
-import jsPDF from 'jspdf';
+import initLibraries, { getPDFJSLib, getJsPDF, VERSION } from './version';
 
 let pdfjsLib = null;
+let jsPDF = null;
 
-// Initialize libraries if not already done
+/**
+ * Initialize PDF.js for split operations
+ */
 async function ensurePDFJSInitialized() {
-  if (!pdfjsLib) {
-    // Use your existing initLibraries function
+  if (!pdfjsLib || !jsPDF) {
     await initLibraries();
-    
-    // Get the pdfjsLib from the global scope or import it
-    // Assuming initLibraries sets up pdfjsLib globally or exports it
-    try {
-      // Try to import it directly if not available globally
-      const module = await import("pdfjs-dist/legacy/build/pdf.mjs");
-      pdfjsLib = module;
-      
-      // Set worker source
-      if (typeof window !== 'undefined') {
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 
-          'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/5.0.375/pdf.worker.min.mjs';
-      }
-    } catch (error) {
-      console.error('Failed to load PDF.js:', error);
-      throw new Error('Failed to load PDF library. Please try again.');
-    }
+    pdfjsLib = await getPDFJSLib();
+    jsPDF = await getJsPDF();
   }
   return pdfjsLib;
 }

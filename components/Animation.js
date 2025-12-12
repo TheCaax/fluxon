@@ -1,12 +1,61 @@
 "use client";
-import { useEffect, useRef } from "react";
 
-export default function AnimatedBg() {
+import { useRef, useEffect } from "react";
+
+export function GradientInkBackground() {
+  const bgRef = useRef(null);
+
+  useEffect(() => {
+    const el = bgRef.current;
+
+    const handleMove = (e) => {
+      const { clientX, clientY } = e;
+
+      const angle =
+        Math.atan2(
+          clientY - window.innerHeight / 2,
+          clientX - window.innerWidth / 2
+        ) *
+        (180 / Math.PI);
+
+      el.style.setProperty("--x", clientX + "px");
+      el.style.setProperty("--y", clientY + "px");
+      el.style.setProperty("--angle", angle + "deg");
+    };
+
+    window.addEventListener("mousemove", handleMove);
+    return () => window.removeEventListener("mousemove", handleMove);
+  }, []);
+
+  return (
+    <div
+      ref={bgRef}
+      className="fixed inset-0 -z-10"
+      style={{
+        background: `
+          radial-gradient(
+            circle at var(--x, 50%) var(--y, 50%),
+            rgba(0,255,100,0.22),
+            transparent 28%
+          ),
+          linear-gradient(var(--angle, 0deg), #090909, #0d0d0d, #111)
+        `,
+        transition: "background 0.1s linear",
+        pointerEvents: "none",
+      }}
+    />
+  );
+}
+
+
+export function MouseAnimation() {
   const canvasRef = useRef(null);
   const particles = useRef([]).current;
 
   useEffect(() => {
     const canvas = canvasRef.current;
+    if (!canvas) return; // Guard: canvas not ready yet
+    
     const ctx = canvas.getContext("2d");
 
     const resize = () => {
@@ -87,10 +136,11 @@ export default function AnimatedBg() {
   }, []);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="fixed inset-0 pointer-events-none"
-      style={{ zIndex: 999 }}
-    />
+    // <canvas
+    //   ref={canvasRef}
+    //   className="fixed inset-0 pointer-events-none"
+    //   style={{ zIndex: 999 }}
+    // />
+    <></>
   );
 }

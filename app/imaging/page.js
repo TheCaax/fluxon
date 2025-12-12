@@ -1,13 +1,12 @@
 "use client";
 
+import { GradientInkBackground, MouseAnimation } from "@/components/Animation";
 import Navbar from "@/components/Navbar";
 import { motion } from "framer-motion";
-import AnimatedBg from "@/components/AnimatedBg";
 import { useState, useRef } from "react";
 import { pdfToImages, getPageCount, convertPageRanges, downloadAsZip } from "@/libs/imaging";
 import Footer from "@/components/Footer";
 import { toast } from "sonner";
-import StarTwinkle from "@/components/StarTwinkle";
 
 export default function Imaging() {
   const [file, setFile] = useState(null);
@@ -135,8 +134,8 @@ export default function Imaging() {
     <>
     <title>Imaging - convert pdfs to images for your need | Fluxon</title>
       <Navbar />
-      <StarTwinkle/>
-      <AnimatedBg />
+      <GradientInkBackground/>
+      <MouseAnimation/>
       <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
