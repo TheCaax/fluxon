@@ -46,7 +46,7 @@ function cleanupResources(pdf, canvases = []) {
     console.warn('Error destroying PDF:', error);
   }
   
-  // Remove canvases from DOM
+  // Remove canvases
   canvases.forEach(canvas => {
     try {
       if (canvas && canvas.parentNode) {

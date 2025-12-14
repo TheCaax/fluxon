@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useRef } from "react";
 import { splitPDF, splitByRanges, downloadAsZip } from "@/libs/split";
 import { GradientInkBackground, MouseAnimation } from "@/components/Animation";
-import { motion } from "framer-motion";
+import { useState, useRef } from "react";
 import Navbar from "@/components/Navbar";
-import { toast } from 'sonner';
 import Footer from "@/components/Footer";
+import { motion } from "framer-motion";
+import { toast } from 'sonner';
 
 export default function SplitPage() {
   const [file, setFile] = useState(null);

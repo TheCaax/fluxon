@@ -2,11 +2,11 @@
 
 import { GradientInkBackground, MouseAnimation } from "@/components/Animation";
 import Navbar from "@/components/Navbar";
-import { motion } from "framer-motion";
+import Footer from "@/components/Footer";
 import { useState, useRef } from "react";
 import { composeNUp } from "@/libs/nup";
+import { motion } from "framer-motion";
 import { toast } from "sonner";
-import Footer from "@/components/Footer";
 
 const PRESETS = [
   { value: "10", label: "10-up (2 × 5)", rows: 5, cols: 2 },

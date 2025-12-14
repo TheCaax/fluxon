@@ -1,12 +1,12 @@
 "use client"
 
 import {FileText, Sparkles, Lock, Zap, ArrowRight, ArrowDownIcon} from "lucide-react";
+import { GradientInkBackground, MouseAnimation } from "@/components/Animation";
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
-import { GradientInkBackground, MouseAnimation } from "@/components/Animation";
 
 export default function Overview() {
   const router = useRouter();
@@ -14,16 +14,10 @@ export default function Overview() {
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
-    // const handleMouseMove = (e) => {
-    //   setMousePosition({ x: e.clientX, y: e.clientY });
-    // };
-
     window.addEventListener("scroll", handleScroll);
-    // window.addEventListener("mousemove", handleMouseMove);
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      // window.removeEventListener("mousemove", handleMouseMove);
     };
   }, []);
 
@@ -184,7 +178,7 @@ export default function Overview() {
             </div>
           </div>
         </section>
-        {/* Quote Block (Replicates your landing page card style) */}
+        {/* Quote Block */}
           <div className="max-w-7xl m-auto mb-10 text-center flex justify-center items-center p-4 border border-indigo-500/30 bg-indigo-500/5 rounded-lg text-lg opacity-85">
             Suggestion: Please use Fluxon for non-essential PDF files that
             contain no sensitive data.

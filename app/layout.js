@@ -1,6 +1,5 @@
-import "../styles/globals.css";
 import { Toaster } from "sonner";
-import Head from "next/head";
+import "../styles/globals.css";
 
 export const metadata = {
   title: {default:"Fluxon - The Minimal PDF Manipulator"},
@@ -15,11 +14,6 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <Head>
-      <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet"/>
-      </Head>
       <body>
         <Toaster position="top-right" closeButton="true" richColors="true" theme="dark" />
         {children}

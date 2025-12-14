@@ -1,7 +1,6 @@
-// components/GradientText.js
 import React from 'react';
 
-const GradientText = ({ children, size = '3xl' }) => {
+export default function GradientText ({ children, size = '3xl' }) {
   // Map sizes to Tailwind utilities for consistency
   const sizeClass = {
     'xl': 'text-xl md:text-2xl',
@@ -27,5 +26,3 @@ const GradientText = ({ children, size = '3xl' }) => {
     </h1>
   );
 };
-
-export default GradientText;

@@ -19,7 +19,7 @@ export default function Merge() {
   const [outputName, setOutputName] = useState("");
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState("Idle");
-  const [currentPhase, setCurrentPhase] = useState(""); // 'merge' or 'invert'
+  const [currentPhase, setCurrentPhase] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const fileInputRef = useRef(null);
 
@@ -81,7 +81,7 @@ export default function Merge() {
           if (typeof current === "number" && typeof total === "number") {
             percent = Math.min(100, (current / total) * 100);
           } else {
-            percent = current; // Already a percentage
+            percent = current;
           }
 
           setProgress(percent);

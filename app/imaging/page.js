@@ -1,11 +1,11 @@
 "use client";
 
+import { pdfToImages, getPageCount, convertPageRanges, downloadAsZip } from "@/libs/imaging";
 import { GradientInkBackground, MouseAnimation } from "@/components/Animation";
 import Navbar from "@/components/Navbar";
-import { motion } from "framer-motion";
 import { useState, useRef } from "react";
-import { pdfToImages, getPageCount, convertPageRanges, downloadAsZip } from "@/libs/imaging";
 import Footer from "@/components/Footer";
+import { motion } from "framer-motion";
 import { toast } from "sonner";
 
 export default function Imaging() {

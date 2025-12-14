@@ -1,8 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import Link from "next/link";
 
 export default function Footer({ name, bridge }) {
   const [currentYear, setCurrentYear] = useState(null);

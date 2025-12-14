@@ -69,14 +69,14 @@ export class PDFMerger {
     try {
       await ensureMergeLibrariesLoaded();
 
-      // STEP 1: MERGE FIRST (same as HTML version workflow)
+      // MERGE
       onProgress?.(0, files.length, 'Merging PDFs...', 'merge');
       
       const mergedBlob = await PDFMerger.mergeWithoutInvert(files, (curr, total, status) => {
         onProgress?.(curr, files.length + 100, status, 'merge');
       });
 
-      // STEP 2: Render and invert the MERGED PDF
+      // Render and invert the MERGED PDF
       onProgress?.(files.length, files.length + 100, 'Preparing to invert...', 'invert');
       
       const mergedData = await mergedBlob.arrayBuffer();
@@ -94,9 +94,9 @@ export class PDFMerger {
       for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
         const page = await pdfDoc.getPage(pageNum);
 
-        // CRITICAL FIX: Use scale 3.5 (not 2.0) - same as HTML version
+        // Use scale 3.5
         const viewport = page.getViewport({
-          scale: 3.5,  // <--- CHANGED FROM 2.0 TO 3.5
+          scale: 3.5,
           rotation: page.rotate,
         });
 
@@ -116,7 +116,7 @@ export class PDFMerger {
           viewport: viewport,
         }).promise;
 
-        // Invert colors directly on rendered canvas (same algorithm as HTML)
+        // Invert colors directly on rendered canvas
         const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const d = imgData.data;
         for (let i = 0; i < d.length; i += 4) {
@@ -143,9 +143,9 @@ export class PDFMerger {
 
         outputPdf.setPage(outputPdf.getNumberOfPages());
         
-        // FIXED: Use 0.9 quality (not 0.92) - same as HTML version
+        // FIXED: Use 0.9 quality
         outputPdf.addImage(
-          canvas.toDataURL('image/jpeg', 0.9),  // <--- CHANGED FROM 0.92 TO 0.9
+          canvas.toDataURL('image/jpeg', 0.9),
           'JPEG',
           0,
           0,

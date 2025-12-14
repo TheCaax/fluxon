@@ -1,10 +1,10 @@
 "use client";
 
 import { GradientInkBackground, MouseAnimation } from "@/components/Animation";
+import GradientText from "@/components/GradientText";
+import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { motion } from "framer-motion";
-import Footer from "@/components/Footer";
-import GradientText from "@/components/GradientText";
 import Link from "next/link";
 import {
   Instagram,
@@ -56,11 +56,10 @@ export default function About() {
         className="text-center mt-30"
       >
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          {/* 🚀 Section 1: Hero/Mission Statement */}
+          {/* Hero/Mission Statement */}
           <section className="text-center mb-20">
             <div className="mb-6">
               <GradientText size="3xl">
-                {/* About Me <span className='text-xl'>(fluxon)</span> */}
                 Behind The Thought
               </GradientText>
             </div>
@@ -85,7 +84,7 @@ export default function About() {
               <Instagram className="text-pink-400 mr-3 w-5 h-5 sm:w-6 sm:h-6 md:mr-5 lg:w-7 lg:h-7" /> Help me to improve &rarr;
             </Link>
           </section>
-          {/* --- 🌈 Neon Divider --- */}
+          {/* Neon Divider */}
           <div className="relative my-20 h-px">
             <div
               className="absolute inset-0 bg-linear-to-r from-transparent via-yellow-500/80 to-transparent shadow-neon"
@@ -96,9 +95,9 @@ export default function About() {
             ></div>
           </div>
           {/* The inline style is used here for the specific "neon glow" effect */}
-          {/* 📚 Section 2: Detailed Content Grid */}
+          {/* Detailed Content Grid */}
           <section className="inline-block text-center p-5">
-            {/* Column 1: Core Story / Why We Exist */}
+            {/* Core Story  */}
             <div className="m-5">
               <h2 className="text-4xl font-semibold text-fuchsia-500 mb-5">
                 My Origin & Purpose
@@ -131,7 +130,7 @@ export default function About() {
               ></div>
             </div>
 
-            {/* Column 2: What Makes Us Different / Features */}
+            {/* What Makes Us Different */}
             <div className="text-center m-8">
               <h2 className="pt-5 text-4xl font-semibold text-emerald-400 mb-6">
                 Features That I provide
@@ -204,7 +203,7 @@ export default function About() {
               </p>
             </div>
           </section>
-          {/* ➡️ Optional: Call to Action */}
+          {/* Call to Action */}
           <section className="flex justify-center items-center flex-row mt-10">
             <Link
               href="/"

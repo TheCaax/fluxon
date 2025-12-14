@@ -54,7 +54,7 @@ export function MouseAnimation() {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return; // Guard: canvas not ready yet
+    if (!canvas) return; // if canvas not ready yet
     
     const ctx = canvas.getContext("2d");
 
@@ -65,11 +65,11 @@ export function MouseAnimation() {
     resize();
     window.addEventListener("resize", resize);
 
-    // CONFIG — tweak these
-    const BURST_PARTICLES = 30; // lower = less dense
-    const PARTICLE_FADE = 0.009; // lower = slower fade & longer life
-    const PARTICLE_SPEED = 0.3; // lower = slower movement
-    const COLOR = "0, 255, 25"; // lime green
+    // CONFIG 
+    const BURST_PARTICLES = 30; 
+    const PARTICLE_FADE = 0.009;
+    const PARTICLE_SPEED = 0.3; 
+    const COLOR = "0, 255, 25"; 
 
     let lastBurst = 0;
 
