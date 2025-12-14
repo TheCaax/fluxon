@@ -100,7 +100,7 @@ async function invertPDF(pdfData) {
     const orientation = viewport.width > viewport.height ? 'landscape' : 'portrait';
     
     // Invert the page
-    const invertedImage = await invertPage(page, 2.0);
+    const invertedImage = await invertPage(page, 3.5);
     
     // Create image element to get dimensions
     const img = new Image();
