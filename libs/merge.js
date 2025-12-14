@@ -16,130 +16,6 @@ async function ensureMergeLibrariesLoaded() {
   }
 }
 
-/**
- * Invert colors using canvas composite operation (more reliable than HSL)
- * This approach works better for PDF content
- * @param {ImageData} imageData - Canvas image data
- */
-function invertColors(imageData) {
-  const data = imageData.data;
-  
-  // Simple inversion: 255 - value for each RGB channel
-  for (let i = 0; i < data.length; i += 4) {
-    data[i] = 255 - data[i];     // Red
-    data[i + 1] = 255 - data[i + 1]; // Green
-    data[i + 2] = 255 - data[i + 2]; // Blue
-    // Alpha channel (i + 3) remains unchanged
-  }
-}
-
-/**
- * Invert a single PDF page using canvas
- * @param {PDFPageProxy} page - PDF.js page object
- * @param {number} scale - Render scale (quality)
- * @returns {Promise<string>} Data URL of inverted page
- */
-async function invertPage(page, scale = 2.0) {
-  const viewport = page.getViewport({
-    scale: scale,
-    rotation: page.rotate,
-  });
-
-  // Create canvas for rendering
-  const canvas = document.createElement('canvas');
-  canvas.width = viewport.width;
-  canvas.height = viewport.height;
-  const context = canvas.getContext('2d', { willReadFrequently: true });
-  
-  if (!context) {
-    throw new Error('Failed to get canvas context');
-  }
-
-  // Fill background with white first (important for transparency handling)
-  context.fillStyle = 'white';
-  context.fillRect(0, 0, canvas.width, canvas.height);
-
-  // Render PDF page to canvas
-  await page.render({
-    canvasContext: context,
-    viewport: viewport,
-  }).promise;
-
-  // Get image data and invert colors
-  const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-  invertColors(imageData);
-  context.putImageData(imageData, 0, 0);
-
-  // Return as data URL
-  return canvas.toDataURL('image/jpeg', 0.92);
-}
-
-/**
- * Invert colors of a PDF file
- * @param {ArrayBuffer} pdfData - PDF file data
- * @returns {Promise<Blob>} Inverted PDF as blob
- */
-async function invertPDF(pdfData) {
-  await ensureMergeLibrariesLoaded();
-
-  const pdfDoc = await pdfjsLib.getDocument({ 
-    data: pdfData,
-    useWorkerFetch: false,
-    isEvalSupported: false,
-    useSystemFonts: true
-  }).promise;
-
-  const totalPages = pdfDoc.numPages;
-  let outputPdf = null;
-
-  for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
-    const page = await pdfDoc.getPage(pageNum);
-    const viewport = page.getViewport({ scale: 1.0 });
-    
-    // Determine orientation
-    const orientation = viewport.width > viewport.height ? 'landscape' : 'portrait';
-    
-    // Invert the page
-    const invertedImage = await invertPage(page, 3.5);
-    
-    // Create image element to get dimensions
-    const img = new Image();
-    await new Promise((resolve) => {
-      img.onload = resolve;
-      img.src = invertedImage;
-    });
-
-    // Create or add page to PDF
-    if (!outputPdf) {
-      outputPdf = new jsPDF({
-        orientation,
-        unit: 'px',
-        format: [img.width, img.height],
-      });
-    } else {
-      outputPdf.addPage([img.width, img.height], orientation);
-    }
-
-    outputPdf.setPage(outputPdf.getNumberOfPages());
-    outputPdf.addImage(
-      invertedImage,
-      'JPEG',
-      0,
-      0,
-      img.width,
-      img.height
-    );
-  }
-
-  pdfDoc.destroy();
-
-  if (!outputPdf) {
-    throw new Error('Failed to create inverted PDF');
-  }
-
-  return outputPdf.output('blob');
-}
-
 export class PDFMerger {
   /**
    * Merge multiple PDF files without color inversion
@@ -183,7 +59,8 @@ export class PDFMerger {
   }
 
   /**
-   * Merge PDFs with color inversion (invert first, then merge)
+   * FIXED: Merge PDFs with color inversion
+   * KEY CHANGE: Merge FIRST, then invert (like HTML version)
    * @param {Array} files - Array of file objects with {file, id}
    * @param {Function} onProgress - Progress callback (current, total, status, phase)
    * @returns {Promise<Blob>}
@@ -192,55 +69,107 @@ export class PDFMerger {
     try {
       await ensureMergeLibrariesLoaded();
 
-      const invertedPdfs = [];
-      const totalFiles = files.length;
-
-      // PHASE 1: Invert each PDF (0-50%)
-      for (let i = 0; i < totalFiles; i++) {
-        const fileItem = files[i];
-        
-        onProgress?.(
-          i * 50 / totalFiles,
-          100,
-          `Inverting colors: ${i + 1}/${totalFiles} files`,
-          'invert'
-        );
-
-        const arrayBuffer = await fileItem.file.arrayBuffer();
-        const invertedBlob = await invertPDF(arrayBuffer);
-        const invertedPdf = await PDFDocument.load(
-          await invertedBlob.arrayBuffer(),
-          { ignoreEncryption: true }
-        );
-        
-        invertedPdfs.push(invertedPdf);
-      }
-
-      // PHASE 2: Merge inverted PDFs (50-100%)
-      onProgress?.(50, 100, 'Merging inverted PDFs...', 'merge');
+      // STEP 1: MERGE FIRST (same as HTML version workflow)
+      onProgress?.(0, files.length, 'Merging PDFs...', 'merge');
       
-      const mergedPdf = await PDFDocument.create();
+      const mergedBlob = await PDFMerger.mergeWithoutInvert(files, (curr, total, status) => {
+        onProgress?.(curr, files.length + 100, status, 'merge');
+      });
+
+      // STEP 2: Render and invert the MERGED PDF
+      onProgress?.(files.length, files.length + 100, 'Preparing to invert...', 'invert');
       
-      for (let i = 0; i < invertedPdfs.length; i++) {
-        const donorPdf = invertedPdfs[i];
-        const copiedPages = await mergedPdf.copyPages(
-          donorPdf,
-          donorPdf.getPageIndices()
+      const mergedData = await mergedBlob.arrayBuffer();
+      const pdfDoc = await pdfjsLib.getDocument({ 
+        data: mergedData,
+        useWorkerFetch: false,
+        isEvalSupported: false,
+        useSystemFonts: true
+      }).promise;
+
+      const totalPages = pdfDoc.numPages;
+      let outputPdf = null;
+
+      // Process each page of the merged PDF
+      for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+        const page = await pdfDoc.getPage(pageNum);
+
+        // CRITICAL FIX: Use scale 3.5 (not 2.0) - same as HTML version
+        const viewport = page.getViewport({
+          scale: 3.5,  // <--- CHANGED FROM 2.0 TO 3.5
+          rotation: page.rotate,
+        });
+
+        // Create canvas for rendering
+        const canvas = document.createElement('canvas');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        const ctx = canvas.getContext('2d');
+        
+        if (!ctx) {
+          throw new Error('Failed to get canvas context');
+        }
+
+        // Render PDF page to canvas
+        await page.render({
+          canvasContext: ctx,
+          viewport: viewport,
+        }).promise;
+
+        // Invert colors directly on rendered canvas (same algorithm as HTML)
+        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const d = imgData.data;
+        for (let i = 0; i < d.length; i += 4) {
+          d[i] = 255 - d[i];         // Red
+          d[i + 1] = 255 - d[i + 1]; // Green
+          d[i + 2] = 255 - d[i + 2]; // Blue
+          // Alpha channel (d[i + 3]) remains unchanged
+        }
+        ctx.putImageData(imgData, 0, 0);
+
+        // Determine orientation
+        const orientation = canvas.width > canvas.height ? 'landscape' : 'portrait';
+
+        // Create or add page to output PDF
+        if (!outputPdf) {
+          outputPdf = new jsPDF({
+            orientation,
+            unit: 'pt',
+            format: [canvas.width, canvas.height],
+          });
+        } else {
+          outputPdf.addPage([canvas.width, canvas.height], orientation);
+        }
+
+        outputPdf.setPage(outputPdf.getNumberOfPages());
+        
+        // FIXED: Use 0.9 quality (not 0.92) - same as HTML version
+        outputPdf.addImage(
+          canvas.toDataURL('image/jpeg', 0.9),  // <--- CHANGED FROM 0.92 TO 0.9
+          'JPEG',
+          0,
+          0,
+          canvas.width,
+          canvas.height
         );
-        
-        copiedPages.forEach((page) => mergedPdf.addPage(page));
-        
-        const progress = 50 + ((i + 1) / invertedPdfs.length) * 50;
+
+        // Update progress
+        const progress = files.length + pageNum;
         onProgress?.(
           progress,
-          100,
-          `Merging: ${i + 1}/${invertedPdfs.length} files`,
-          'merge'
+          files.length + totalPages,
+          `Inverted ${pageNum}/${totalPages} pages`,
+          'invert'
         );
       }
 
-      const pdfBytes = await mergedPdf.save();
-      return new Blob([pdfBytes], { type: 'application/pdf' });
+      pdfDoc.destroy();
+
+      if (!outputPdf) {
+        throw new Error('Failed to create inverted PDF');
+      }
+
+      return outputPdf.output('blob');
     } catch (error) {
       throw error;
     }
